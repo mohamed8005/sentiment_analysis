@@ -1,0 +1,41 @@
+<div class="dashboard-container" fxLayout="column" fxLayoutGap="20px">
+  <div class="toggle-container-chat">
+    <span>Hide Chat</span>
+    <div class="custom-toggle" (click)="toggleVisible()" [class.on]="visible">
+      <div class="toggle-circle" [class.on]="visible"></div>
+    </div>
+  </div>
+  <div class="toggle-container">
+    <span>AI Toggle</span>
+    <div class="custom-toggle" (click)="toggleAI()" [class.on]="machineLearning">
+      <div class="toggle-circle" [class.on]="machineLearning"></div>
+    </div>
+  </div>
+    <div class="main-content" fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="start stretch">
+      <app-commande fxFlex="97"></app-commande>
+    </div>
+    
+    <div class="result-section"  fxLayout="column">
+      <mat-card  style="box-shadow: 0 13px 10px rgba(0,0,0,0.3)">
+        <mat-card-title>Résultats</mat-card-title>
+        <mat-card-content>
+          <div *ngIf="result || result2; else noResult">
+          <div *ngIf="result; ">
+            {{ result }}
+          </div>
+          <div style="display: flex;justify-content: center;align-items: center;width: 100%;" *ngIf="result2; ">
+            <!-- <app-dynamic-table style="width: fit-content !important;" [data]="result2"></app-dynamic-table> -->
+            <app-dynamic-tree style="width: fit-content !important;overflow-x: auto;" [data]="result2"></app-dynamic-tree>
+            
+          </div>
+        </div>
+          <ng-template #noResult>
+            Aucun résultat pour le moment.
+          </ng-template>
+        </mat-card-content>
+      </mat-card>
+    </div>
+    
+    <app-chat [machineLearning]="this.machineLearning" [visible]="this.visible"  fxFlex="30" style="z-index: 10;"></app-chat>
+  </div>
+  

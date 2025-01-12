@@ -1,0 +1,122 @@
+
+.tree {
+  overflow-y: hidden; /* Prevent vertical overflow */
+  white-space: nowrap; /* Prevent elements from wrapping */
+}
+.tree ul {
+  padding-top: 20px;
+  position: relative;
+  display: inline-block; /* Maintain horizontal alignment of the tree */
+  white-space: nowrap; /* Prevent child elements from wrapping */
+  transition: all 0.5s;
+}
+
+.tree li {
+  display: inline-block; /* Ensure tree nodes remain in a single line */
+  text-align: center;
+  list-style-type: none;
+  position: relative;
+  padding: 20px 5px 0 5px;
+  transition: all 0.5s;
+}
+
+/* Lines connecting parent to children */
+.tree li::before,
+.tree li::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 20px;
+  border-top: 2px solid #ccc;
+}
+
+.tree li::before {
+  right: 50%;
+  border-right: 2px solid #ccc;
+}
+
+.tree li::after {
+  left: 50%;
+  border-left: 2px solid #ccc;
+}
+
+.tree ul ul::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 0;
+  height: 20px;
+  border-left: 2px solid #ccc;
+}
+
+/* Node styles with different colors for layers */
+.tree ul > li > .node {
+  display: block;
+  padding: 10px;
+  border: 2px solid #666;
+  border-radius: 8px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.tree ul > li > .node:nth-child(odd) {
+  background-color: #ffcccb; /* Light red */
+  color: #333;
+}
+
+.tree ul > li > .node:nth-child(even) {
+  background-color: #add8e6; /* Light blue */
+  color: #333;
+}
+
+.tree ul ul > li > .node {
+  background-color: #d3ffd3; /* Light green */
+  color: #333;
+}
+
+.tree ul ul ul > li > .node {
+  background-color: #ffecb3; /* Light yellow */
+  color: #333;
+}
+
+/* Value styles, stacked below keys */
+.leaf {
+  display: block;
+  margin-top: 5px;
+  padding: 5px 10px;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+
+.tree::-webkit-scrollbar {
+  height: 8px; /* Set the height of the horizontal scrollbar */
+  width: 8px; /* Set the width of the vertical scrollbar */
+}
+
+/* Customize the scrollbar thumb (the draggable part) */
+.tree::-webkit-scrollbar-thumb {
+  background-color: #888; /* Set the color of the thumb */
+  border-radius: 10px; /* Round the edges of the thumb */
+  border: 2px solid #444; /* Optional: Add a border around the thumb */
+}
+
+/* Customize the scrollbar track (the area the thumb moves within) */
+.tree::-webkit-scrollbar-track {
+  background-color: #f1f1f1; /* Light background for the scrollbar track */
+  border-radius: 10px; /* Round the edges of the track */
+}
+
+/* Add hover effect on the thumb */
+.tree::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Darken the thumb when hovered */
+}
+
+/* Customize the scrollbar corner */
+.tree::-webkit-scrollbar-corner {
+  background-color: #f1f1f1; /* Background color for the corner where the scrollbars meet */
+}

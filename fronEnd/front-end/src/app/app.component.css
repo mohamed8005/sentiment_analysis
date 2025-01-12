@@ -1,0 +1,28 @@
+:host {
+    display: block;
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  :host::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    /* A more subtle Indigo-based gradient with fewer stops */
+    background: linear-gradient(270deg, #9fa8da, #5c6bc0, #9fa8da);
+    background-size: 600% 600%;
+    animation: subtleMove 60s linear infinite; /* Slow horizontal movement */
+  }
+  
+  @keyframes subtleMove {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+  }
+  
+  /* Add some padding to the main container if needed */
+  .main-container {
+    padding: 20px;
+  }
+  

@@ -1,0 +1,73 @@
+.tree-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    text-align: left;
+    position: relative;
+  }
+  
+  /* General cell styles */
+  .tree-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+  }
+  
+  /* Styling for key cells in each column */
+  .tree-table td:nth-child(1) {
+    background-color: #ffebcd; /* Blanched Almond for column 1 */
+    font-weight: bold;
+  }
+  
+  .tree-table td:nth-child(2) {
+    background-color: #add8e6; /* Light Blue for column 2 */
+    font-weight: bold;
+  }
+  
+  .tree-table td:nth-child(3) {
+    background-color: #90ee90; /* Light Green for column 3 */
+    font-weight: bold;
+  }
+  
+  .tree-table td:nth-child(4) {
+    background-color: #ffcccb; /* Light Red for column 4 */
+    font-weight: bold;
+  }
+  
+  /* Root node styles (optional) */
+  .tree-table .nested {
+    font-weight: bold;
+    border: 2px solid #666;
+    border-radius: 8px;
+    padding: 10px;
+    position: relative;
+  }
+  
+
+  
+  .tree-table td::before {
+    left: -20px;
+    width: 20px;
+  }
+  
+  .tree-table td::after {
+    left: 100%;
+    width: 20px;
+  }
+  
+  /* Leaf styles */
+  .tree-table td:last-child {
+    background-color: #f9f9f9;
+    border-left: 2px solid #666;
+  }
+  
+  /* Recursive table styling */
+  .tree-table td > table {
+    margin-left: 20px;
+    border-collapse: collapse;
+  }
+  
+  /* Styling for empty rows */
+  .tree-table td:empty {
+    border: none;
+  }
+  

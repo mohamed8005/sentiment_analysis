@@ -1,0 +1,49 @@
+<mat-card style="box-shadow: 0 13px 10px rgba(0,0,0,0.3)"> 
+    <mat-card-title>Créer une Commande</mat-card-title>
+    <mat-card-content>
+      <div class="container" fxLayout="row" fxLayoutGap="20px">
+        <!-- Liste des Éléments Disponibles -->
+        <div class="drag-drop-section" fxFlex="45" #elementsContainer>
+          <h3>Éléments Disponibles</h3>
+          <div
+            cdkDropList
+            id="elements"
+            [cdkDropListData]="elements"
+            class="drop-list"
+            (cdkDropListDropped)="drop($event)"
+          >
+            <div class="draggable-item"
+                 *ngFor="let element of elements"
+                 cdkDrag
+                 [ngStyle]="{'background-color': element.background, 'color': 'white'}">
+              {{ element.name }}
+            </div>
+          </div>
+        </div>
+        
+        <!-- Liste de la Commande -->
+        <div class="drag-drop-section" fxFlex="45" #commandeContainer>
+          <h3>Commande</h3>
+          <div
+            cdkDropList
+            id="commande"
+            [cdkDropListData]="commande"
+            class="drop-list"
+            (cdkDropListDropped)="drop($event)"
+          >
+            <div class="draggable-item"
+                 *ngFor="let item of commande"
+                 cdkDrag
+                 [ngStyle]="{'background-color': item.background, 'color': 'white'}">
+              {{ item.name }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top: 20px;">
+        <button mat-raised-button color="primary" (click)="envoyer()">Envoyer la Commande</button>
+        <button mat-raised-button color="warn" style="margin-left: 10px;" (click)="resetCommande()">Réinitialiser</button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  

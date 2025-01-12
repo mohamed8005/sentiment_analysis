@@ -1,0 +1,7 @@
+*.json
+myvenv
+myvenv/*
+*.zip
+api_sentiment.py
+*.docx
+frontend.zip

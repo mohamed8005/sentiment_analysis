@@ -1,0 +1,31 @@
+<div *ngIf="data && objectKeys(data).length > 0; else noData">
+    <table class="tree-table">
+      <thead>
+        <tr>
+          <!-- <th>Key</th>
+          <th>Value</th> -->
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let key of objectKeys(data)">
+          <tr>
+            <td [class.nested]="isObject(data[key])">{{ key }}</td>
+            <td>
+              <ng-container *ngIf="isObject(data[key]); else displayValue">
+                <!-- Recursive call to render nested data -->
+                <app-dynamic-table [data]="data[key]"></app-dynamic-table>
+              </ng-container>
+              <ng-template #displayValue>
+                {{ data[key] }}
+              </ng-template>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+  
+  <ng-template #noData>
+    <p>No data available to display.</p>
+  </ng-template>
+  

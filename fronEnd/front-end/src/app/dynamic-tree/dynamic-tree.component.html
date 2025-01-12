@@ -1,0 +1,20 @@
+<div [ngStyle]="{'overflow-x': depth === 0 ? 'auto !important' : 'hidden'}" class="tree">    <ul>
+      <ng-container *ngFor="let key of objectKeys(data)">
+        <li>
+          <!-- Node Key -->
+          <span class="node">{{ key }}</span>
+          
+          <!-- Child Nodes -->
+          <ng-container  *ngIf="isObject(data[key]); else displayValue">
+            <app-dynamic-tree   [data]="data[key]" [depth]="depth + 1"></app-dynamic-tree>
+          </ng-container>
+          
+          <!-- Value as a Leaf -->
+          <ng-template #displayValue>
+            <span class="leaf">{{ data[key] }}</span>
+          </ng-template>
+        </li>
+      </ng-container>
+    </ul>
+  </div>
+  
