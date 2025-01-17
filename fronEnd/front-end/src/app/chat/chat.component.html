@@ -1,19 +1,12 @@
-<mat-card [ngStyle]="{'display': !visible ? 'block' : 'none'}" class="chat-card mat-elevation-z4">
-    <mat-card-title>Chat</mat-card-title>
-    <mat-card-content>
-      <div class="messages">
-        <div *ngFor="let msg of messages" [ngClass]="{'user-message': msg.user, 'bot-message': !msg.user}">
-          {{ msg.text }}
-        </div>
-      </div>
-      <div class="input-bar">
-        <mat-form-field class="full-width">
-          <input matInput placeholder="Posez votre question" [(ngModel)]="nouveauMessage" (keyup.enter)="envoyerMessage()">
-        </mat-form-field>
-        <button mat-icon-button color="primary" (click)="envoyerMessage()">
-          <mat-icon>send</mat-icon>
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
-  
+<div class="floating-chatbar" [ngStyle]="{ 'display': !visible ? 'flex' : 'none' }">
+  <input
+    type="text"
+    placeholder="Write a sentence you'd like to have a sentiment analysis on."
+    [(ngModel)]="nouveauMessage"
+    (keyup.enter)="envoyerMessage()"
+    class="chat-input"
+  />
+  <button (click)="envoyerMessage()" class="generate-button">
+    Envoyer
+  </button>
+</div>

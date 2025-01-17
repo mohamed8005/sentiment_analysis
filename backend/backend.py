@@ -503,67 +503,6 @@ def analyze_sentiment():
 
 
 
-@app.route('/export', methods=['POST'])
-def handle_export():
-    # Parse the JSON payload
-    payload = request.get_json()
-    instructions = payload.get("instructions", {})
-    if not instructions:
-        return jsonify({"error": "No instructions provided"}), 400
-
-    # Extract instruction components
-    files = instructions.get("files", [])
-    sentiments = instructions.get("sentiments", [])
-    timeframes = instructions.get("timeframes", [])
-    filters = instructions.get("filters", [])
-    export = instructions.get("export", False)  # Check for export flag
-
-    # Names for seasons and months
-    season_names = {1: "printemps", 2: "été", 3: "automne", 4: "hiver"}
-    month_names = {
-        1: "janvier", 2: "février", 3: "mars", 4: "avril",
-        5: 'mai', 6: 'juin', 7: 'juillet', 8: 'août',
-        9: 'septembre', 10: 'octobre', 11: 'novembre', 12: 'décembre'
-    }
-
-    # Filtered data container
-    filtered_data = []
-
-    # Process each file type
-    for file_type in files:
-        data = load_data(file_type)
-
-        # Filter data based on the given criteria
-        if not timeframes:  # No specific timeframes
-            filtered_data.extend(apply_filters(data, sentiments, filters))
-        else:
-            for timeframe in timeframes:
-                if timeframe == "saisons":
-                    for season in range(1, 5):  # 1 = Spring, ..., 4 = Winter
-                        filtered_season = filter_by_time(data, "seasons", season)
-                        for item in filtered_season:
-                            item['season'] = season_names[season]
-                        filtered_data.extend(filtered_season)
-                elif timeframe == "mois":
-                    for month in range(1, 13):  # 1 = January, ..., 12 = December
-                        filtered_month = filter_by_time(data, "months", month)
-                        for item in filtered_month:
-                            item['month'] = month_names[month]
-                        filtered_data.extend(filtered_month)
-                elif timeframe == "années":
-                    unique_years = {datetime.utcfromtimestamp(item["created_utc"]).year for item in data}
-                    for year in unique_years:
-                        filtered_year = filter_by_time(data, "years", year)
-                        for item in filtered_year:
-                            item['year'] = year
-                        filtered_data.extend(filtered_year)
-
-    # If export is enabled, generate a CSV file with the filtered data
-    if export:
-        return create_excel_response(filtered_data)
-
-    # Default response if export is not requested
-    return jsonify({"status": "success", "filtered_data": filtered_data}), 200
 
 
 def apply_filters(data, sentiments, filters):
@@ -597,49 +536,267 @@ def select_by_time(data, timeframe, value):
     return result
 
 
-def create_csv_response(filtered_data):
-    """Create a CSV response from filtered data."""
-    if not filtered_data:
-        return jsonify({"error": "No data available to export"}), 400
 
-    # Create an in-memory CSV file
-    output = io.StringIO()
-    csv_writer = csv.writer(output)
+season_names = {
+    1: "printemps",
+    2: "été",
+    3: "automne",
+    4: "hiver"
+}
 
-    # Write the header based on keys of the first dictionary
-    header = filtered_data[0].keys() if filtered_data else []
-    csv_writer.writerow(header)
+month_names = {
+    1: "janvier",
+    2: "février",
+    3: "mars",
+    4: "avril",
+    5: "mai",
+    6: "juin",
+    7: "juillet",
+    8: "août",
+    9: "septembre",
+    10: "octobre",
+    11: "novembre",
+    12: "décembre"
+}
 
-    # Write the rows
-    for row in filtered_data:
-        csv_writer.writerow(row.values())
+POSITIVE_LABELS = ["positive", "relatively positive", "very positive", "extremely positive"]
+NEGATIVE_LABELS = ["negative", "relatively negative", "very negative", "extremely negative"]
+NEUTRAL_LABELS  = ["neutral"]
 
-    # Prepare the response
-    response = Response(output.getvalue(), mimetype="text/csv")
-    response.headers["Content-Disposition"] = "attachment; filename=export.csv"
-    return response
+def filter_by_sentiments(data, sentiments_requested):
+    """
+    Keep only items whose sentiment label matches 
+    the 'positifs', 'negatifs', or 'neutres' sets.
+    """
+    allowed_labels = set()
+    if "positifs" in sentiments_requested:
+        allowed_labels.update(POSITIVE_LABELS)
+    if "negatifs" in sentiments_requested:
+        allowed_labels.update(NEGATIVE_LABELS)
+    if "neutres" in sentiments_requested:
+        allowed_labels.update(NEUTRAL_LABELS)
 
-def create_excel_response(filtered_data):
-    """Create an Excel response from filtered data."""
-    if not filtered_data:
-        return jsonify({"error": "No data available to export"}), 400
+    # If user didn't specify sentiments, or the set is empty => no filter
+    if not allowed_labels:
+        return data
 
-    # Create a DataFrame from the filtered data
-    df = pd.DataFrame(filtered_data)
+    filtered = []
+    for item in data:
+        label = item.get("content_sentiment", {}).get("sentiment", "")
+        if label in allowed_labels:
+            filtered.append(item)
+    return filtered
 
-    # Create an in-memory Excel file
-    output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-        df.to_excel(writer, index=False, sheet_name='Sheet1')
-    output.seek(0)
 
-    # Prepare the response
-    response = Response(
-        output.getvalue(),
-        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+# ------------------------------------------------------------------------
+# Timeframe Filtering
+# ------------------------------------------------------------------------
+def recursively_gather_data_by_timeframes(data, timeframes, index, gathered=None):
+    """
+    Recursively gather data items matching each timeframe in `timeframes`.
+    E.g. if ['années','saisons'], we group by year, then by season, etc.
+    Instead of returning nested structure, we accumulate matching items in `gathered`.
+    """
+    if gathered is None:
+        gathered = []
+
+    if index >= len(timeframes):
+        # No more timeframes to apply => add all data
+        gathered.extend(data)
+        return gathered
+
+    current_tf = timeframes[index]
+    if current_tf == 'années':
+        unique_years = sorted({datetime.utcfromtimestamp(it["created_utc"]).year for it in data})
+        for year in unique_years:
+            subset = [it for it in data if datetime.utcfromtimestamp(it["created_utc"]).year == year]
+            recursively_gather_data_by_timeframes(subset, timeframes, index + 1, gathered)
+    elif current_tf == 'saisons':
+        for season_id in [1,2,3,4]:
+            subset = []
+            for it in data:
+                dt = datetime.utcfromtimestamp(it["created_utc"])
+                s = (dt.month % 12 + 3) // 3
+                if s == season_id:
+                    subset.append(it)
+            recursively_gather_data_by_timeframes(subset, timeframes, index + 1, gathered)
+    elif current_tf == 'mois':
+        for month_id in range(1,13):
+            subset = []
+            for it in data:
+                dt = datetime.utcfromtimestamp(it["created_utc"])
+                if dt.month == month_id:
+                    subset.append(it)
+            recursively_gather_data_by_timeframes(subset, timeframes, index + 1, gathered)
+    else:
+        # Unknown timeframe => pass all
+        gathered.extend(data)
+
+    return gathered
+
+
+# ------------------------------------------------------------------------
+# Adding Label Columns (Seasons, Months, Years) to Each Item
+# ------------------------------------------------------------------------
+def add_timeframe_columns(item, include_year=False, include_season=False, include_month=False):
+    """
+    Append columns like 'year_label', 'season_label', 'month_label'
+    as textual (French) names. E.g. 'été', 'janvier', etc.
+    """
+    dt = datetime.utcfromtimestamp(item["created_utc"])
+
+    if include_year:
+        # e.g. 2023
+        item["year_label"] = str(dt.year)
+
+    if include_month:
+        # e.g. "janvier"
+        item["month_label"] = month_names.get(dt.month, str(dt.month))
+
+    if include_season:
+        # e.g. "été"
+        s = (dt.month % 12 + 3) // 3
+        item["season_label"] = season_names.get(s, str(s))
+
+    return item
+
+
+# ------------------------------------------------------------------------
+# Flatten each item for CSV
+# ------------------------------------------------------------------------
+def flatten_record(item):
+    """
+    Flatten one item into a dictionary for the CSV row.
+    We also include year_label, season_label, month_label if present.
+    """
+    flat = {}
+    flat["created_utc"]  = item.get("created_utc", "")
+    flat["subreddit"]    = item.get("subreddit", "")
+    flat["author"]       = item.get("author", "")
+    flat["title"]        = item.get("title", "")
+    flat["content"]      = item.get("content", "")
+
+    # sentiment info
+    s_info = item.get("content_sentiment", {})
+    flat["sentiment_label"]    = s_info.get("sentiment", "")
+    flat["sentiment_compound"] = s_info.get("compound", "")
+    flat["sentiment_pos"]      = s_info.get("pos", "")
+    flat["sentiment_neg"]      = s_info.get("neg", "")
+    flat["sentiment_neu"]      = s_info.get("neu", "")
+
+    # if we have textual labels for year/season/month, include them
+    if "year_label" in item:
+        flat["year"] = item["year_label"]
+    if "month_label" in item:
+        flat["month"] = item["month_label"]
+    if "season_label" in item:
+        flat["season"] = item["season_label"]
+
+    return flat
+
+
+
+@app.route('/export', methods=['POST'])
+def export_data():
+    """
+    This endpoint filters the data by:
+      - 'files': which JSON files to load (posts, comments)
+      - 'timeframes': which time dimension to filter by (années, saisons, mois)
+      - 'sentiments': e.g. ["positifs", "negatifs", "neutres"]
+    Then returns the *raw, filtered* data as CSV, 
+    and includes columns for year/season/month if relevant.
+    """
+    payload = request.get_json()
+    instructions = payload.get("instructions", {})
+    if not instructions:
+        return jsonify({"error": "No instructions provided"}), 400
+
+    # 1) Parse the instructions
+    files       = instructions.get("files", [])
+    timeframes  = instructions.get("timeframes", [])    # e.g. ["années", "saisons"]
+    sentiments  = instructions.get("sentiments", [])    # e.g. ["positifs"]
+    # You might also have filters, metrics, etc.
+
+    # We'll see if we need to label columns for year, season, month in the CSV
+    include_year   = ("années"  in timeframes)
+    include_season = ("saisons" in timeframes)
+    include_month  = ("mois"    in timeframes)
+
+    all_filtered_items = []
+    
+    # 2) For each requested file, load data
+    for file_type in files:
+        data = load_data(file_type)
+
+        # (a) Filter by timeframes
+        if timeframes:
+            matched_items = []
+            recursively_gather_data_by_timeframes(
+                data=data, 
+                timeframes=timeframes, 
+                index=0, 
+                gathered=matched_items
+            )
+        else:
+            matched_items = data  # no timeframe filtering
+
+        # (b) Filter by sentiments
+        matched_items = filter_by_sentiments(matched_items, sentiments)
+
+        # (c) Add columns for year/season/month if we want them in the CSV
+        new_items = []
+        for itm in matched_items:
+            # We'll *copy* or modify in-place. For simplicity, just do in-place:
+            add_timeframe_columns(
+                itm,
+                include_year=include_year,
+                include_season=include_season,
+                include_month=include_month
+            )
+            new_items.append(itm)
+
+        all_filtered_items.extend(new_items)
+
+    # 3) Convert to CSV
+    #    Decide your CSV columns. We'll guess them from flatten_record
+    csv_buffer = io.StringIO()
+    # Build a superset of all columns you might use
+    fieldnames = [
+        "created_utc",
+        "subreddit",
+        "author",
+        "title",
+        "content",
+        "sentiment_label",
+        "sentiment_compound",
+        "sentiment_pos",
+        "sentiment_neg",
+        "sentiment_neu",
+    ]
+    if include_year:
+        fieldnames.append("year")
+    if include_season:
+        fieldnames.append("season")
+    if include_month:
+        fieldnames.append("month")
+
+    writer = csv.DictWriter(csv_buffer, fieldnames=fieldnames)
+    writer.writeheader()
+
+    for item in all_filtered_items:
+        flat = flatten_record(item)
+        writer.writerow(flat)
+
+    csv_data = csv_buffer.getvalue()
+    csv_buffer.close()
+
+    # 4) Return as a CSV file download
+    return Response(
+        csv_data,
+        mimetype="text/csv",
+        headers={
+            "Content-disposition": "attachment; filename=exported_data.csv"
+        }
     )
-    response.headers["Content-Disposition"] = "attachment; filename=export.xlsx"
-    return response
-
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

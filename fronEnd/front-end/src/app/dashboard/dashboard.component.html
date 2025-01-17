@@ -17,7 +17,7 @@
     
     <div class="result-section"  fxLayout="column">
       <mat-card  style="box-shadow: 0 13px 10px rgba(0,0,0,0.3)">
-        <mat-card-title>Résultats</mat-card-title>
+        <mat-card-title style="margin-left: 5px;">Results</mat-card-title>
         <mat-card-content>
           <div *ngIf="result || result2; else noResult">
           <div *ngIf="result; ">
@@ -30,7 +30,7 @@
           </div>
         </div>
           <ng-template #noResult>
-            Aucun résultat pour le moment.
+            No result to be displayed at the moment.
           </ng-template>
         </mat-card-content>
       </mat-card>

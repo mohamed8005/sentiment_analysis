@@ -46,7 +46,7 @@ console.log({ text: this.nouveauMessage, user: false ,machineLearning: this.mach
         // this.messages.push({ text: reponse.reply, user: false, machineLearning: this.machineLearning });
         this.sharedService.loadingPage(false)
         // Update the shared service result
-        this.sharedService.updateResult(`cette phrase a un sentiment : "${reponse.sentiment}" avec un score total de: ${reponse.compound} `);
+        this.sharedService.updateResult(`this sentence has a "${reponse.sentiment}" ,with a total score of: ${reponse.compound} `);
         this.sharedService.updateResult2("");
       },
       error: (error) => {

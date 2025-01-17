@@ -15,54 +15,37 @@ export class CommandeComponent implements OnInit {
   @ViewChild('elementsContainer') elementsContainer!: ElementRef;
   @ViewChild('commandeContainer') commandeContainer!: ElementRef;
 
-  elements: any[] = [
-    //file
-    { id: -1, name: 'Posts', background: '#2c315e' ,type:"file"},   // Green 200
-    { id: 0, name: 'Comments', background: '#2c315e'  ,type:"file"},
+   elements: any[] = [
+    // File
+    { id: -1, name: 'Posts', label: 'Posts', background: '#2c315e', type: "file" },
+    { id: 0, name: 'Comments', label: 'Comments', background: '#2c315e', type: "file" },
+  
     // Sentiment Types
-    { id: 1, name: 'Positifs', background: '#a5d6a7' ,type:"Sentiment"},   // Green 200
-    { id: 2, name: 'Negatifs', background: '#ef9a9a' ,type:"Sentiment"},   // Red 200
-    { id: 3, name: 'Neutres', background: '#bdbdbd' ,type:"Sentiment"},    // Grey 400
+    { id: 1, name: 'Positifs', label: 'Positive', background: '#a5d6a7', type: "Sentiment" },
+    { id: 2, name: 'Negatifs', label: 'Negative', background: '#ef9a9a', type: "Sentiment" },
+    { id: 3, name: 'Neutres', label: 'Neutral', background: '#bdbdbd', type: "Sentiment" },
   
     // Metrics
-    { id: 4, name: 'nombre', background: '#7986cb' ,type:"Metrics"},      // Indigo 300
-    { id: 5, name: 'pourcentage', background: '#7986cb' ,type:"Metrics"},
-    { id: 5, name: 'data', background: '#7986cb' ,type:"export"},
+    { id: 4, name: 'nombre', label: 'Count', background: '#7986cb', type: "Metrics" },
+    { id: 5, name: 'pourcentage', label: 'Percentage', background: '#7986cb', type: "Metrics" },
+    { id: 6, name: 'data', label: 'Data', background: '#7986cb', type: "export" },
   
     // Timeframes
-    // { id: 6, name: 'temps', background: '#b39ddb' ,type:"Timeframes"},    // Deep Purple 200
-    // { id: 7, name: 'jours', background: '#b39ddb' ,type:"Timeframes"},
-    { id: 8, name: 'mois', background: '#b39ddb' ,type:"Timeframes"},
-    // { id: 9, name: 'durée', background: '#b39ddb' ,type:"Timeframes"},
-    // { id: 10, name: 'heures', background: '#b39ddb' ,type:"Timeframes"},
-    // { id: 11, name: 'semaines', background: '#b39ddb' ,type:"Timeframes"},
-    { id: 12, name: 'années', background: '#b39ddb' ,type:"Timeframes"},
-    { id: 13, name: 'saisons', background: '#b39ddb' ,type:"Timeframes"},
+    { id: 7, name: 'mois', label: 'Months', background: '#b39ddb', type: "Timeframes" },
+    { id: 8, name: 'années', label: 'Years', background: '#b39ddb', type: "Timeframes" },
+    { id: 9, name: 'saisons', label: 'Seasons', background: '#b39ddb', type: "Timeframes" },
   
     // Statistical Measures
-    { id: 14, name: 'moyenne', background: '#90caf9' ,type:"Measures"},   // Blue 200
-    { id: 15, name: 'médiane', background: '#90caf9' ,type:"Measures"},
-    { id: 16, name: 'maximal', background: '#90caf9' ,type:"Measures"},
-    { id: 17, name: 'minimal', background: '#90caf9' ,type:"Measures"},
-    // { id: 18, name: 'tendance', background: '#90caf9' ,type:"Measures"},
-    // { id: 19, name: 'évolution', background: '#90caf9' ,type:"Measures"},
-    // { id: 20, name: 'augmentation', background: '#90caf9' ,type:"Measures"},
-    // { id: 21, name: 'diminution', background: '#90caf9' ,type:"Measures"},
+    { id: 10, name: 'moyenne', label: 'Average', background: '#90caf9', type: "Measures" },
+    { id: 11, name: 'médiane', label: 'Median', background: '#90caf9', type: "Measures" },
+    { id: 12, name: 'maximal', label: 'Maximum', background: '#90caf9', type: "Measures" },
+    { id: 13, name: 'minimal', label: 'Minimum', background: '#90caf9', type: "Measures" },
   
     // Filters/Context
-    // { id: 22, name: 'filtrer', background: '#ffcc80' ,type:"Filters"},   // Orange 200
-    // { id: 23, name: 'mot-clé', background: '#ffcc80' ,type:"Filters"},
-    { id: 24, name: 'subreddit', background: '#ffcc80' ,type:"Filters"},
-    { id: 24, name: 'user', background: '#ffcc80' ,type:"Filters"},
-    // { id: 25, name: 'catégorie', background: '#ffcc80' ,type:"Filters"},
-  
-    // Comparisons/Rankings
-    // { id: 26, name: 'comparaison', background: '#bcaaa4' ,type:"Rankings"}, // Brown 200
-    // { id: 27, name: 'classement', background: '#bcaaa4' ,type:"Rankings"},
-    // { id: 28, name: 'top', background: '#bcaaa4' ,type:"Rankings"},
-    // { id: 29, name: 'plus élevé', background: '#bcaaa4' ,type:"Rankings"},
-    // { id: 30, name: 'plus bas', background: '#bcaaa4' ,type:"Rankings"}
+    { id: 14, name: 'subreddit', label: 'Subreddit', background: '#ffcc80', type: "Filters" },
+    { id: 15, name: 'user', label: 'User', background: '#ffcc80', type: "Filters" }
   ];
+  
   
   
 
@@ -214,7 +197,7 @@ export class CommandeComponent implements OnInit {
           const url = window.URL.createObjectURL(blob);
           const anchor = document.createElement('a');
           anchor.href = url;
-          anchor.download = 'exported_data.xlsx'; // File name
+          anchor.download = 'exported_data.csv'; // File name
           anchor.click();
           window.URL.revokeObjectURL(url);
         },
@@ -235,7 +218,7 @@ export class CommandeComponent implements OnInit {
         this.snackBar.open('Commande envoyée avec succès!', 'Fermer', { duration: 3000 });
         
         // Clear the commande array after successful submission
-        this.commande = [];
+        // this.commande = [];
         this.sharedService.loadingPage(false)
       },
       error: (error) => {
@@ -251,8 +234,8 @@ export class CommandeComponent implements OnInit {
     });
    
     
-    this.elements=this.elements.concat(this.commande).sort((a, b) => a.id - b.id);;
-    this.commande=[]
+    // this.elements=this.elements.concat(this.commande).sort((a, b) => a.id - b.id);;
+    // this.commande=[]
   }
   resetCommande() {
     // Return all commande items to the elements list if you want them back

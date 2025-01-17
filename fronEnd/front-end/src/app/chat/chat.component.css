@@ -1,41 +1,49 @@
-/* src/app/chat/chat.component.css */
-.chat-card {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 300px;
-    /* Custom shadow */
-    box-shadow: -8px -5px 13px 8px  rgba(0,0,0,0.3);
-  }
+.floating-chatbar {
+  position: fixed;
+  bottom: 20px;
+  right: 50%;
+  transform: translateX(50%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 60%;
+  max-width: 90%;
+  height: 44px;
+  border-radius: 25px;
+  background: white;
+  padding: 5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  border: 3px solid #2196f3;
+  border-image-slice: 1;
   
-  .messages {
-    max-height: 200px;
-    overflow-y: auto;
-    margin-bottom: 10px;
-  }
-  
-  .user-message {
-    text-align: right;
-    background-color: #dcf8c6;
-    padding: 8px;
-    border-radius: 10px;
-    margin: 5px 0;
-  }
-  
-  .bot-message {
-    text-align: left;
-    background-color: #f1f0f0;
-    padding: 8px;
-    border-radius: 10px;
-    margin: 5px 0;
-  }
-  
-  .input-bar {
-    display: flex;
-    align-items: center;
-  }
-  
-  .full-width {
-    flex: 1;
-  }
-  
+}
+
+.chat-input {
+  flex: 1;
+  border: none;
+  border-radius: 25px;
+  height: 100%;
+  padding: 0 15px;
+  font-size: 16px;
+  outline: none;
+  background: none;
+}
+
+.generate-button {
+  border: none;
+  border-radius: 25px;
+  padding: 0 20px;
+  height: 100%;
+  margin-left: 10px;
+  font-size: 16px;
+  color: white;
+  background: linear-gradient(90deg, #2196f3, #8bbee7);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.generate-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}

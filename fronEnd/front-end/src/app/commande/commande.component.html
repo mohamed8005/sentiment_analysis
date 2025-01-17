@@ -1,10 +1,10 @@
-<mat-card style="box-shadow: 0 13px 10px rgba(0,0,0,0.3)"> 
-    <mat-card-title>Créer une Commande</mat-card-title>
+<mat-card style="box-shadow: 0 13px 10px rgba(0,0,0,0.3);padding-left: 3px;"> 
+    <mat-card-title>Build your Command</mat-card-title>
     <mat-card-content>
       <div class="container" fxLayout="row" fxLayoutGap="20px">
         <!-- Liste des Éléments Disponibles -->
         <div class="drag-drop-section" fxFlex="45" #elementsContainer>
-          <h3>Éléments Disponibles</h3>
+          <h3>Available Elements</h3>
           <div
             cdkDropList
             id="elements"
@@ -16,14 +16,14 @@
                  *ngFor="let element of elements"
                  cdkDrag
                  [ngStyle]="{'background-color': element.background, 'color': 'white'}">
-              {{ element.name }}
+              {{ element.label }}
             </div>
           </div>
         </div>
         
         <!-- Liste de la Commande -->
         <div class="drag-drop-section" fxFlex="45" #commandeContainer>
-          <h3>Commande</h3>
+          <h3>Constructed Command</h3>
           <div
             cdkDropList
             id="commande"
@@ -35,14 +35,14 @@
                  *ngFor="let item of commande"
                  cdkDrag
                  [ngStyle]="{'background-color': item.background, 'color': 'white'}">
-              {{ item.name }}
+              {{ item.label }}
             </div>
           </div>
         </div>
       </div>
       <div style="margin-top: 20px;">
-        <button mat-raised-button color="primary" (click)="envoyer()">Envoyer la Commande</button>
-        <button mat-raised-button color="warn" style="margin-left: 10px;" (click)="resetCommande()">Réinitialiser</button>
+        <button mat-raised-button color="primary" (click)="envoyer()">Send Commande</button>
+        <button mat-raised-button color="warn" style="margin-left: 10px;" (click)="resetCommande()">Reset</button>
       </div>
     </mat-card-content>
   </mat-card>
