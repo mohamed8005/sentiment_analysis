@@ -30,3 +30,17 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
   }
   
+  mat-card {
+    margin: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Softer shadow */
+    background-color: #ffffff;
+  }
+
+  mat-card-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #444;
+    border-bottom: 1px solid #ddd; /* Add a separator */
+    padding-bottom: 8px;
+  }
